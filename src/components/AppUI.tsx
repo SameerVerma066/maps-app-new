@@ -1,27 +1,14 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Box,
-  Button,
-  Flex,
-  Stack,
-  SkeletonText,
-  Collapse,
-} from "@chakra-ui/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import {
   useJsApiLoader,
-  GoogleMap,
-  Marker,
-  DirectionsRenderer,
 } from "@react-google-maps/api";
 import { MAPS_API_KEY } from "@/utils/mapsApiKey";
 import LocationInput from "./common/LocationInput";
-import RouteButtons from "./common/RouteButtons";
-import RouteInfo from "./common/RouteInfo";
-import { BikeRateCards, TruckRateCards, PackersMoversCards, IntercityCourierCards } from "./RateCards";
 
-const center = { lat: 25.605028755206394, lng: 85.07451919725354 };
+import { BikeRateCards, TruckRateCards, PackersMoversCards, IntercityCourierCards } from "./RateCards";
 
 export default function AppUI() {
   const { isLoaded } = useJsApiLoader({
@@ -30,49 +17,18 @@ export default function AppUI() {
   });
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [directionsResponse, setDirectionsResponse] =
-    useState<google.maps.DirectionsResult | null>(null);
-  const [distance, setDistance] = useState<string>("");
-  const [duration, setDuration] = useState<string>("");
-  const [originMarker, setOriginMarker] =
-    useState<google.maps.LatLngLiteral | null>(null);
+
 
   const originRef = useRef<HTMLInputElement>(null!);
   const destRef = useRef<HTMLInputElement>(null!);
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+  
 
-  useEffect(() => {
-    function handleResize() {
-      setIsCollapsed(window.innerWidth < 733 && window.innerHeight < 617);
-    }
-    window.addEventListener("resize", handleResize);
-    handleResize();
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  
 
-  if (!isLoaded) return <SkeletonText />;
+  if (!isLoaded) return <Skeleton className="h-6 w-32" />;
 
-  async function calculateRoute() {
-    if (!originRef.current?.value || !destRef.current?.value) return;
-    const directionsService = new google.maps.DirectionsService();
-    const results = await directionsService.route({
-      origin: originRef.current.value,
-      destination: destRef.current.value,
-      travelMode: google.maps.TravelMode.DRIVING,
-    });
-    setDirectionsResponse(results);
-    const leg = results.routes[0].legs[0];
-    setDistance(leg.distance?.text || "");
-    setDuration(leg.duration?.text || "");
-  }
 
-  function clearRoute() {
-    setDirectionsResponse(null);
-    setDistance("");
-    setDuration("");
-    if (originRef.current) originRef.current.value = "";
-    if (destRef.current) destRef.current.value = "";
-  }
+
 
   function getCurrentLocation() {
     if (navigator.geolocation) {
@@ -87,7 +43,6 @@ export default function AppUI() {
             map?.panTo(latlng);
             map?.setZoom(8);
             setTimeout(() => map?.setZoom(15), 300);
-            setOriginMarker(latlng);
           } else {
             alert("No address found.");
           }
@@ -99,166 +54,64 @@ export default function AppUI() {
   }
 
   return (
-    <Box minH="100vh" bg="#fafbfc">
+    <div className="min-h-screen bg-[#fafbfc]">
       {/* Header */}
-      <Flex
-        as="header"
-        align="center"
-        justify="space-between"
-        px={8}
-        py={4}
-        bg="white"
-        boxShadow="sm"
-      >
-        <Box
-          fontWeight="bold"
-          fontSize="2xl"
-          color="#2474ff"
-          letterSpacing={1}
-        >
-          DELIVERY PARTNERS
-        </Box>
-        <Flex gap={8} fontWeight="medium" fontSize="sm">
-          
-          
-          <Box as="a" href="#">
-            Support
-          </Box>
-        </Flex>
-      </Flex>
+      <div className="flex items-center justify-between px-8 py-4 bg-white shadow-sm">
+        <div className="font-bold text-2xl text-[#2474ff] tracking-wide">DELIVERY PARTNERS</div>
+        <div className="flex gap-8 font-medium text-sm">
+          <a href="#" className="hover:underline">Support</a>
+        </div>
+      </div>
 
       {/* Hero Section with background */}
-      <Box
-        position="relative"
-        w="100%"
-        h={{ base: "320px", md: "380px" }}
-        bgImage="url('https://ik.imagekit.io/vf1wtj1uk/deliverypartners/3d-rendering-buddha-statue-cave.jpg?updatedAt=1748935408872')"
-        bgSize="cover"
-        bgPosition="center"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
+      <div
+        className="relative w-full h-[320px] md:h-[380px] bg-cover bg-center flex items-center justify-center"
+        style={{ backgroundImage: "url('https://ik.imagekit.io/vf1wtj1uk/deliverypartners/3d-rendering-buddha-statue-cave.jpg?updatedAt=1748935408872')" }}
       >
-        <Box
-          position="absolute"
-          top={0}
-          left={0}
-          w="100%"
-          h="100%"
-          bg="rgba(0,0,0,0.45)"
-        />
-        <Box position="relative" zIndex={1} textAlign="center" color="white">
-          <Box
-            fontSize={{ base: "2xl", md: "3xl" }}
-            fontWeight="bold"
-            mb={2}
-          >
-            Reliable Goods Transportation Services 
-          </Box>
-          <Box
-            fontSize={{ base: "md", md: "lg" }}
-            maxW="lg"
-            mx="auto"
-            mb={4}
-          >
-           
-          </Box>
-         
-        </Box>
+        <div className="absolute top-0 left-0 w-full h-full bg-black/45" />
+        <div className="relative z-10 text-center text-white">
+          <div className="text-2xl md:text-3xl font-bold mb-2">Reliable Goods Transportation Services</div>
+          <div className="text-md md:text-lg max-w-lg mx-auto mb-4"></div>
+        </div>
 
         {/* Floating Card */}
-        <Box
-          position="absolute"
-          left="50%"
-          bottom="-60px"
-          transform="translateX(-50%)"
-          bg="white"
-          borderRadius="lg"
-          boxShadow="xl"
-          px={{ base: 2, md: 8 }}
-          py={6}
-          w={{ base: "95vw", md: "900px" }}
-          zIndex={2}
-        >
-          <Flex align="center" gap={4} mb={4}>
-            
-          </Flex>
-          <Stack
-            direction={{ base: "column", md: "row" }}
-            spacing={4}
-            align="center"
-          >
-            <Box flex={2}>
+        <div className="absolute left-1/2 -bottom-16 transform -translate-x-1/2 bg-white rounded-lg shadow-xl px-2 md:px-8 py-6 w-[95vw] md:w-[900px] z-20">
+          <div className="flex items-center gap-4 mb-4"></div>
+          <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 items-center">
+            <div className="flex-2">
               <LocationInput placeholder="Pickup Address *" inputRef={originRef} />
-            </Box>
-            <Box flex={2}>
+            </div>
+            <div className="flex-2">
               <LocationInput placeholder="Drop Address *" inputRef={destRef} />
-            </Box>
-            <Box flex={2}>
-              <input
-                type="text"
-                placeholder="Phone Number *"
-                style={{
-                  width: "100%",
-                  padding: "8px",
-                  borderRadius: "6px",
-                  border: "1px solid #e2e8f0",
-                }}
-              />
-            </Box>
-            <Box flex={1}>
-              <input
-                type="text"
-                placeholder="Name *"
-                style={{
-                  width: "100%",
-                  padding: "8px",
-                  borderRadius: "6px",
-                  border: "1px solid #e2e8f0",
-                }}
-              />
-            </Box>
-            <Box flex={1}>
-              <select
-                style={{
-                  width: "100%",
-                  padding: "8px",
-                  borderRadius: "6px",
-                  border: "1px solid #e2e8f0",
-                }}
-              >
+            </div>
+            <div className="flex-2">
+              <input type="text" placeholder="Phone Number *" className="input input-bordered w-full" />
+            </div>
+            <div className="flex-1">
+              <input type="text" placeholder="Name *" className="input input-bordered w-full" />
+            </div>
+            <div className="flex-1">
+              <select className="select select-bordered w-full">
                 <option>What describes you best? *</option>
                 <option>Business</option>
                 <option>Individual</option>
               </select>
-            </Box>
-            <Button
-              colorScheme="blue"
-              px={8}
-              py={6}
-              fontWeight="bold"
-              fontSize="md"
-              borderRadius="md"
-              rightIcon={
-                <Box as="span" className="material-icons">
-                  
-                </Box>
-              }
-            >
+            </div>
+            <button className="btn btn-primary px-8 py-6 font-bold font-md border-radius-md">
               Get an estimate
-            </Button>
-          </Stack>
-        </Box>
-      </Box>
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Main Content */}
-      <Box mt={32} px={4}>
+      <div className="mt-32 px-4">
         <BikeRateCards />
         <TruckRateCards type="light" />
         <TruckRateCards type="heavy" />
         <PackersMoversCards />
         <IntercityCourierCards />
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }

@@ -1,5 +1,4 @@
 import { Autocomplete } from "@react-google-maps/api";
-import { Input, Box } from "@chakra-ui/react";
 import React, { RefObject } from "react";
 
 interface LocationInputProps {
@@ -9,15 +8,15 @@ interface LocationInputProps {
 
 export default function LocationInput({ placeholder, inputRef }: LocationInputProps) {
   return (
-    <Box flexGrow={1}>
+    <div className="flex-grow">
       <Autocomplete>
-        <Input
+        <input
           type="text"
           placeholder={placeholder}
           ref={inputRef}
-          size="xs"
+          className="px-2 py-1 border border-gray-300 rounded text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
       </Autocomplete>
-    </Box>
+    </div>
   );
 }
